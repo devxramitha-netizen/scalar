@@ -9,7 +9,6 @@ import { type LoaderPlugin, bundle } from '@scalar/json-magic/bundle'
 import { fetchUrls } from '@scalar/json-magic/bundle/plugins/browser'
 import { type Difference, apply, diff, merge } from '@scalar/json-magic/diff'
 import { createMagicProxy, getRaw } from '@scalar/json-magic/magic-proxy'
-import { upgrade } from '@scalar/openapi-upgrader'
 import { asyncApiObjectSchema } from '@scalar/schemas/asyncapi/3.1'
 import type { Record } from '@scalar/typebox'
 import { Value } from '@scalar/typebox/value'
@@ -80,6 +79,8 @@ import type {
 } from '@/schemas/workspace'
 import type { WorkspaceSpecification } from '@/schemas/workspace-specification'
 import type { WorkspacePlugin, WorkspaceStateChangeEvent } from '@/workspace-plugin'
+
+import { upgradeDocuments } from './plugins/bundler/upgrade-documents'
 
 /**
  * Maximum number of external references and example `externalValue`s fetched at once while bundling
@@ -1258,7 +1259,7 @@ export const createWorkspaceStore = (workspaceProps?: WorkspaceProps): Workspace
       return true
     }
 
-    const inputDocument = withMeasurementSync('upgrade', () => upgrade(deepClone(clonedRawInputDocument), '3.1'))
+    const inputDocument = deepClone(clonedRawInputDocument)
 
     const strictDocument: UnknownObject = createMagicProxy(
       {
@@ -1266,7 +1267,10 @@ export const createWorkspaceStore = (workspaceProps?: WorkspaceProps): Workspace
         // Partial API descriptions still need document traversal rather than standalone schema traversal.
         openapi: inputDocument.openapi ?? '',
         ...meta,
-        'x-original-oas-version': clonedRawInputDocument.openapi ?? clonedRawInputDocument.swagger,
+        'x-original-oas-version':
+          clonedRawInputDocument['x-original-oas-version'] ??
+          clonedRawInputDocument.openapi ??
+          clonedRawInputDocument.swagger,
         'x-scalar-original-document-hash': input.documentHash,
         'x-scalar-original-source-url': input.documentSource,
       },
@@ -1287,6 +1291,7 @@ export const createWorkspaceStore = (workspaceProps?: WorkspaceProps): Workspace
             plugins: [
               ...loaders,
               codeSampleSources(),
+              upgradeDocuments(clonedRawInputDocument.openapi ?? clonedRawInputDocument.swagger),
               openApiDocument(),
               normalizeRefs(),
               externalValueResolver({ lazy: true }),
@@ -1762,11 +1767,15 @@ export const createWorkspaceStore = (workspaceProps?: WorkspaceProps): Workspace
       }
 
       return bundle(target, {
-        root: activeDocument,
+        inputPath: path,
         traversal: 'document',
+        root: activeDocument ? unpackProxyObject(activeDocument) : undefined,
         origin: activeDocument?.['x-scalar-original-source-url'],
         treeShake: false,
         plugins: [
+          ...(activeDocument && isOpenApiDocument(activeDocument)
+            ? [upgradeDocuments(activeDocument['x-original-oas-version'])]
+            : []),
           codeSampleSources(path),
           openApiDocument(),
           fetchUrls({
