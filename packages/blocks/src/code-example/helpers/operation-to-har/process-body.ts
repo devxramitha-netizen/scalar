@@ -323,10 +323,10 @@ export const processBody = ({
 
   // Try to extract examples from the schema
   const mediaType = requestBody.content[_contentType]
-  const contentSchema = getResolvedRef(mediaType?.schema ?? mediaType?.itemSchema)
+  const contentSchema = mediaType?.schema ?? mediaType?.itemSchema
   if (typeof contentSchema !== 'undefined') {
     const extractedExample = getExampleFromSchema(
-      snapshotSchema(contentSchema),
+      snapshotSchema(contentSchema) as SchemaObject,
       {
         compositionSelection: requestBodyCompositionSelection,
         mode: 'write',
@@ -348,7 +348,7 @@ export const processBody = ({
             encoding,
             undefined,
             _contentType === 'multipart/form-data',
-            contentSchema,
+            getResolvedRef(contentSchema),
           ),
         }
       }
