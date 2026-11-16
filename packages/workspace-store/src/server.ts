@@ -26,6 +26,7 @@ import {
   fillChunkRef,
   navigationHeader,
 } from '@/helpers/chunk-index'
+import { compactUpgradeMetadata } from '@/helpers/compact-upgrade-metadata'
 import { createChunkWriter } from '@/helpers/create-chunk-writer'
 import { deepClone } from '@/helpers/deep-clone'
 import { encodeChunkName } from '@/helpers/encode-chunk-name'
@@ -849,6 +850,7 @@ export async function createServerWorkspaceStore(
           treeShake: false,
           plugins: [upgradeDocuments(loaded.openapi ?? loaded.swagger), ...loaders],
         })
+        compactUpgradeMetadata(data)
       }
       if (isThreeTwo) {
         await bundle(data, {
