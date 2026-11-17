@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.80.1",
+    "date": "2026-11-17",
+    "title": "Polish and bug fixes",
+    "content": [
+      {
+        "type": "href",
+        "href": "https://github.com/scalar/scalar/blob/main/packages/api-reference/CHANGELOG.md#1801",
+        "label": "Read full release notes"
+      }
+    ]
+  },
+  {
     "version": "1.80.0",
     "date": "2026-11-17",
     "title": "Plugin document types and accessibility improvements",

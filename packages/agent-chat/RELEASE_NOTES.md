@@ -9,6 +9,12 @@
   on every release - edits made directly here will be overwritten.
 -->
 
+## 0.12.55 (2026-11-17)
+
+### Polish and bug fixes
+
+[Read full release notes](https://github.com/scalar/scalar/blob/main/packages/agent-chat/CHANGELOG.md#01255)
+
 ## 0.12.54 (2026-11-17)
 
 ### Plugin document types and TypeScript 6 support

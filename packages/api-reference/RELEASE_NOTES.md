@@ -9,6 +9,12 @@
   on every release - edits made directly here will be overwritten.
 -->
 
+## 1.80.1 (2026-11-17)
+
+### Polish and bug fixes
+
+[Read full release notes](https://github.com/scalar/scalar/blob/main/packages/api-reference/CHANGELOG.md#1801)
+
 ## 1.80.0 (2026-11-17)
 
 ### Plugin document types and accessibility improvements

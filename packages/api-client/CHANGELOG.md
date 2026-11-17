@@ -1,5 +1,9 @@
 # @scalar/api-client
 
+## 3.27.1
+
+No changes in this release.
+
 ## 3.27.0
 
 ### Minor Changes

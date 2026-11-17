@@ -11,13 +11,13 @@
 
 ## 0.21.4 (2026-11-17)
 
-### Plugin document handling and TypeScript 6 support
+### Plugin document types and TypeScript 6 compatibility
 
-This release improves how plugin documents are classified and processed throughout the application, ensuring they are handled consistently and excluded from features that do not support them.
+This release stabilizes plugin document classification and ensures the mock server builds correctly with TypeScript 6.
 
-- Plugin documents now maintain consistent classification during replacement, hydration, and rebasing operations.
-- Plugin documents are excluded from Ask AI features and authentication processing.
-- Builds with TypeScript 6 now preserve package output paths and application aliases correctly.
+- Plugin documents are now consistently classified throughout document replacement, hydration, and rebasing
+- Plugin documents are excluded from Ask AI processing and unsupported operations, even when they contain OpenAPI or AsyncAPI fields
+- Package output paths and application aliases are preserved when building with TypeScript 6
 
 [Read full release notes](https://github.com/scalar/scalar/blob/main/packages/mock-server/CHANGELOG.md#0214)
 

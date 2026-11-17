@@ -1,5 +1,11 @@
 # @scalar/blocks
 
+## 0.7.4
+
+### Patch Changes
+
+- [#11050](https://github.com/scalar/scalar/pull/11050): Include upgraded OpenAPI 3.0 and Swagger 2.0 file uploads, file arrays, and empty binary request bodies in generated code examples.
+
 ## 0.7.3
 
 ### Patch Changes

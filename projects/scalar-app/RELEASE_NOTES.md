@@ -9,6 +9,20 @@
   on every release - edits made directly here will be overwritten.
 -->
 
+## 1.1.52 (2026-11-17)
+
+### cURL import now handles POST requests and data flags correctly
+
+The cURL importer has been rewritten to match how curl actually processes commands. It now correctly imports POST requests copied from Chrome and Firefox, handles bundled flags, reads multipart form data, and processes cmd.exe-style commands with their escape characters.
+
+- POST requests copied from Chrome no longer import as GET requests
+- Data flags (-d, --data) are now correctly imported as the request body instead of query parameters
+- Bundled short flags like -sG and attached flags like -XPOST are now properly recognized
+- Commands copied as cURL for cmd.exe from Chrome or Firefox now import with their caret and quote escapes removed
+- Multipart form uploads with -F or --form now import correctly with their fields and POST method
+
+[Read full release notes](https://github.com/scalar/scalar/blob/main/projects/scalar-app/CHANGELOG.md#1152)
+
 ## 1.1.51 (2026-11-17)
 
 ### Multi-file uploads, improved schema tooltips, and TypeScript 6 support
