@@ -779,6 +779,9 @@ export const bundleDocument = async (
   )
   references.register(documentRoot, getDefaultOrigin())
   const defaultOrigin = references.origin(documentRoot) ?? getDefaultOrigin()
+  const mappingOrigin = config.preserveReference
+    ? (references.retrievalOrigin(documentRoot) ?? getDefaultOrigin())
+    : defaultOrigin
   const hasRootIdentity =
     references.identity(documentRoot) !== undefined || identifySchema(documentRoot)?.id !== undefined
   const relocationTargets = new WeakMap<object, RelocationTarget>()
@@ -815,7 +818,7 @@ export const bundleDocument = async (
   if (isObject(storedDocuments)) {
     for (const [key, document] of Object.entries(storedDocuments)) {
       const retrievalUri = bundledDocumentUri(
-        defaultOrigin,
+        mappingOrigin,
         key,
         documentRoot[config.externalDocumentsMappingsKey][key],
       )
@@ -828,15 +831,15 @@ export const bundleDocument = async (
         document,
         retrievalUri,
         [config.externalDocumentsKey, key],
-        resolveReferencePath(defaultOrigin, source ?? key),
+        resolveReferencePath(mappingOrigin, source ?? key),
       )
     }
   }
   for (const [uri, pending] of [...cache]) {
     const result = await pending
     if (result.ok) {
-      const retrievalUri = resolveReferencePath(defaultOrigin, uri)
-      const relativeUri = toRelativePath(retrievalUri, defaultOrigin)
+      const retrievalUri = resolveReferencePath(mappingOrigin, uri)
+      const relativeUri = toRelativePath(retrievalUri, mappingOrigin)
       if (diagnostics) cache.set(relativeUri, pending)
       const key = await generate(relativeUri)
       traversal.register(result.data, retrievalUri)
@@ -998,7 +1001,7 @@ export const bundleDocument = async (
         return
       }
       if (config.preserveReference)
-        sourceReferences.set(root, { reference: ref, origin: nodeOrigin, path: currentPath })
+        sourceReferences.set(getRaw(root), { reference: ref, origin: nodeOrigin, path: currentPath })
       const isChunk = '$global' in root && typeof root['$global'] === 'boolean' && root['$global']
 
       // Try to convert the reference to a local reference if possible
@@ -1019,7 +1022,7 @@ export const bundleDocument = async (
           return
         }
         if (config.preserveReference && local.value !== undefined)
-          relocationTargets.set(root, { path: local.segments, context: location?.context ?? 'schema' })
+          relocationTargets.set(getRaw(root), { path: local.segments, context: location?.context ?? 'schema' })
         // A fragment under an embedded $id resolves within that schema, not the document.
         // Without a declared root identity, retain references to root resources rather
         // than baking a retrieval location into an otherwise portable bundle.
@@ -1108,7 +1111,7 @@ export const bundleDocument = async (
           const target = references.resolve(ref, nodeOrigin)
           if (target?.value !== undefined) {
             if (config.preserveReference)
-              relocationTargets.set(root, { path: target.segments, context: location?.context ?? 'schema' })
+              relocationTargets.set(getRaw(root), { path: target.segments, context: location?.context ?? 'schema' })
             if (!target.preserveReference) root.$ref = referenceToRoot(`#/${target.path}`, nodeOrigin)
           } else {
             report('missing-target')
@@ -1123,7 +1126,7 @@ export const bundleDocument = async (
       // correctly within the context of the external file being processed
       const retrievalOrigin = references.retrievalOrigin(root) ?? nodeOrigin
       const resolvedPath = resolveReferencePath(retrievalOrigin, prefix)
-      const relativePath = toRelativePath(resolvedPath, defaultOrigin)
+      const relativePath = toRelativePath(resolvedPath, mappingOrigin)
 
       // Generate a unique compressed path for the external document
       // This is used as a key to store and reference the bundled external document
@@ -1191,7 +1194,7 @@ export const bundleDocument = async (
             ? `#/${target.path}`
             : prefixInternalRef(`#${path}`, [config.externalDocumentsKey, compressedPath])
           if (config.preserveReference)
-            relocationTargets.set(root, {
+            relocationTargets.set(getRaw(root), {
               path: parsePath(bundledReference.substring(1)),
               context: location?.context ?? 'schema',
             })
