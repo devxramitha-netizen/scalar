@@ -21,7 +21,7 @@ jobs:
     # Holds the release bot app credentials (without NPM_TOKEN) so the docs PR
     # can be opened by the app rather than by GITHUB_TOKEN.
     environment: release-bot
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6.0.3
 
